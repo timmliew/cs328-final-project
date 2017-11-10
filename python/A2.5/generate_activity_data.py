@@ -112,12 +112,21 @@ for i, (train_indexes, test_indexes) in enumerate(cv):
     print conf
     
     # TODO: Compute the accuracy, precision and recall from the confusion matrix
-    
+    accuracy_scores = accuracy_score(y_test, y_pred) + accuracy_scores
+    precision_scores = precision_score(y_test, y_pred, average='macro') + precision_scores
+    recall_scores = recall_score(y_test, y_pred, average='macro') + recall_scores
     print("\n")
 
-# TODO: Output the average accuracy, precision and recall over the 10 folds 
+# TODO: Output the average accuracy, precision and recall over the 10 folds
+print "Accuracy:"
+print accuracy_scores / 10
+print "Precision:"
+print precision_scores / 10
+print "Recall:"
+print recall_scores / 10
 
-# TOO: Then change the CV parameter shuffle to True and describe how the results change.
+# TODO: Then change the CV parameter shuffle to True and describe how the results change.
+cv = cross_validation.KFold(n, n_folds=10, shuffle=True, random_state=None)
 
 
 # Train on entire dataset; that will give us the decision boundary we'll plot.

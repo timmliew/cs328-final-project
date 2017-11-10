@@ -80,8 +80,18 @@ n_samples = 1000
 time_elapsed_seconds = (data[n_samples,0] - data[0,0]) / 1000
 sampling_rate = n_samples / time_elapsed_seconds
 
-feature_names = ["mean X", "mean Y", "mean Z"]
-class_names = ["Stationary", "Walking"]
+feature_names = [
+     "mean X", "mean Y", "mean Z",
+     "median X", "median Y", "median Z",
+     "var X", "var Y", "var Z",
+     "stddev X", "stddev Y", "stddev Z",
+     "min X", "min Y", "min Z",
+     "max X", "max Y", "max Z",
+     "mean mag", "median mag", "var Z",
+     "stddev mag", "min mag", "max mag",
+     "fftx", "ffty", "fftz",
+     "entropy"]
+class_names = ["Jogging", "Jumping"]
 
 print("Extracting features and labels for window size {} and step size {}...".format(window_size, step_size))
 sys.stdout.flush()
@@ -116,13 +126,21 @@ sys.stdout.flush()
 # It should be clear from the plot that these two features are alone very uninformative.
 print("Plotting data points...")
 sys.stdout.flush()
-plt.figure()
-formats = ['bo', 'go']
-for i in range(0,len(y),10): # only plot 1/10th of the points, it's a lot of data!
-    plt.plot(X[i,0], X[i,1], formats[int(y[i])])
-    
-plt.show()
 
+def plotFeatures(feature1, feature2, index1, index2 ):
+    plt.figure()
+    formats = ['bo', 'go']
+    for i in range(0,len(y),10): # only plot 1/10th of the points, it's a lot of data!
+        plt.plot(X[i,index1], X[i,index2], formats[int(y[i])])
+    plt.title("Relationship between " + feature1 + " and " + feature2)
+    plt.xlabel(feature1)
+    plt.ylabel(feature2)
+    plt.show()
+
+
+# plotFeatures("Mean Z", "Median Z", 2, 5)
+# plotFeatures("Var Z", "Std. Dev. Z", 8, 11)
+# plotFeatures("Min Z", "Max Z", 14, 17)
 # %%---------------------------------------------------------------------------
 #
 #		                Train & Evaluate Classifier
@@ -137,15 +155,49 @@ n_classes = len(class_names)
 
 cv = cross_validation.KFold(n, n_folds=10, shuffle=False, random_state=None)
 
-for i, (train_indexes, test_indexes) in enumerate(cv):
-    print("Fold {}".format(i))
-    
+def train_classifier(classifier, label):
+
+    treeaprscores = {'accuracy_scores': 0, 'precision_scores': 0, 'recall_scores': 0}
+    for i, (train_indexes, test_indexes) in enumerate(cv):
+        print("Fold {}".format(i))
+        X_train = X[train_indexes]
+        y_train = y[train_indexes]
+        X_test = X[test_indexes]
+        y_test = y[test_indexes]
+
+        classifier.fit(X_train, y_train)
+        y_pred = classifier.predict(X_test)
+        conf = confusion_matrix(y_test, y_pred)
+
+        treeaprscores['accuracy_scores'] = accuracy_score(y_test, y_pred) + treeaprscores['accuracy_scores']
+        treeaprscores['precision_scores'] = precision_score(y_test, y_pred, average='macro') + treeaprscores['precision_scores']
+        treeaprscores['recall_scores'] = recall_score(y_test, y_pred, average='macro') + treeaprscores['recall_scores']
+    print treeaprscores, label
+
+
+tree32 = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=2)
+train_classifier(tree32, "max depth = 3, max features = 2")
+
+tree62 = DecisionTreeClassifier(criterion="entropy", max_depth=6, max_features=2)
+train_classifier(tree62, "max depth = 6, max features = 2")
+
+tree310 = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=10)
+train_classifier(tree310, "max depth = 3, max features = 10")
+export_graphviz(tree310, out_file='tree.dot', feature_names = feature_names)
+
+tree86 = DecisionTreeClassifier(criterion="entropy", max_depth=8, max_features=6)
+train_classifier(tree86, "max depth = 8, max features = 6")
+
 # TODO: Evaluate another classifier, i.e. SVM, Logistic Regression, k-NN, etc.
-    
-# TODO: Once you have collected data, train your best model on the entire 
+knn = neighbors.KNeighborsClassifier(n_neighbors=5, weights='uniform')  # uniform or distance
+train_classifier(knn, "k-NN")
+
+# TODO: Once you have collected data, train your best model on the entire
 # dataset. Then save it to disk as follows:
+best = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=10)
+best.fit(X,y)
 
 # when ready, set this to the best model you found, trained on all the data:
-best_classifier = None 
+best_classifier = best
 with open('classifier.pickle', 'wb') as f: # 'wb' stands for 'write bytes'
     pickle.dump(best_classifier, f)
