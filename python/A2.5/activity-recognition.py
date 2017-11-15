@@ -22,7 +22,7 @@ from features import extract_features # make sure features.py is in the same dir
 from util import reorient, reset_vars
 
 # TODO: Replace the string with your user ID
-user_id = ""
+user_id = "102017"
 
 count = 0
 
@@ -61,7 +61,22 @@ def predict(window):
     print("Buffer filled. Run your classifier.")
     
     # TODO: Predict class label
-    
+
+
+    x = extract_features(window)
+    activity = classifier.predict([x])
+    if int(activity[0]) == 0:
+        print "Walking"
+        onActivityDetected("Walking")
+    elif int(activity[0]) == 1:
+        print "Sitting"
+        onActivityDetected("Sitting")
+    elif int(activity[0]) == 2:
+        print "Jumping"
+        onActivityDetected("Jumping")
+    elif int(activity[0]) == 3:
+        print "Ascending Stairs"
+        onActivityDetected("Ascending Stairs")
     return
     
     
