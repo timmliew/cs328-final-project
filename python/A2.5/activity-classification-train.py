@@ -33,9 +33,12 @@ from sklearn.tree import DecisionTreeClassifier, export_graphviz
 from sklearn import svm
 from features import extract_features # make sure features.py is in the same directory
 from util import slidingWindow, reorient, reset_vars
-from sklearn import cross_validation
+from sklearn import cross_validation, neighbors
 from sklearn.metrics import confusion_matrix
 import pickle
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 
 
 # %%---------------------------------------------------------------------------
@@ -91,7 +94,7 @@ feature_names = [
      "stddev mag", "min mag", "max mag",
      "fftx", "ffty", "fftz",
      "entropy"]
-class_names = ["Ascending Stairs", "Jogging", "Walking", "Sitting"]
+class_names = ["Walking", "Sitting", "Jumping", "Ascending Stairs"]
 
 print("Extracting features and labels for window size {} and step size {}...".format(window_size, step_size))
 sys.stdout.flush()
@@ -175,26 +178,27 @@ def train_classifier(classifier, label):
     print treeaprscores, label
 
 
-tree32 = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=2)
-train_classifier(tree32, "max depth = 3, max features = 2")
+# tree32 = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=2)
+# train_classifier(tree32, "max depth = 3, max features = 2")
 
-tree62 = DecisionTreeClassifier(criterion="entropy", max_depth=6, max_features=2)
-train_classifier(tree62, "max depth = 6, max features = 2")
+# tree62 = DecisionTreeClassifier(criterion="entropy", max_depth=6, max_features=2)
+# train_classifier(tree62, "max depth = 6, max features = 2")
 
-tree310 = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=10)
-train_classifier(tree310, "max depth = 3, max features = 10")
-export_graphviz(tree310, out_file='tree.dot', feature_names = feature_names)
+# tree310 = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=10)
+# train_classifier(tree310, "max depth = 3, max features = 10")
+# export_graphviz(tree310, out_file='tree.dot', feature_names = feature_names)
 
-tree86 = DecisionTreeClassifier(criterion="entropy", max_depth=8, max_features=6)
-train_classifier(tree86, "max depth = 8, max features = 6")
+# tree86 = DecisionTreeClassifier(criterion="entropy", max_depth=8, max_features=6)
+# train_classifier(tree86, "max depth = 8, max features = 6")
 
 # TODO: Evaluate another classifier, i.e. SVM, Logistic Regression, k-NN, etc.
-knn = neighbors.KNeighborsClassifier(n_neighbors=5, weights='uniform')  # uniform or distance
+knn = neighbors.KNeighborsClassifier(n_neighbors=4, weights='uniform')  # uniform or distance
 train_classifier(knn, "k-NN")
+# export_graphviz(knn, out_file='tree.dot', feature_names = feature_names)
 
 # TODO: Once you have collected data, train your best model on the entire
 # dataset. Then save it to disk as follows:
-best = DecisionTreeClassifier(criterion="entropy", max_depth=3, max_features=10)
+best = knn
 best.fit(X,y)
 
 # when ready, set this to the best model you found, trained on all the data:

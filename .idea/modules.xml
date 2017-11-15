@@ -2,8 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
+=======
+      <module fileurl="file://C:\Users\Mary\AndroidStudioProjects\cs328-a2-5-group-10\CS328-A1.iml" filepath="C:\Users\Mary\AndroidStudioProjects\cs328-a2-5-group-10\CS328-A1.iml" />
+      <module fileurl="file://C:\Users\Mary\AndroidStudioProjects\cs328-a2-5-group-10\CS328-A1-update.iml" filepath="C:\Users\Mary\AndroidStudioProjects\cs328-a2-5-group-10\CS328-A1-update.iml" />
+>>>>>>> 23f0eb51f84856d483f88e34f4a57ef2aa96ea68
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/cs328-a2-5-group-10.iml" filepath="$PROJECT_DIR$/cs328-a2-5-group-10.iml" />
+      <module fileurl="file://C:\Users\Mary\AndroidStudioProjects\cs328-a2-5-group-10\cs328-a2-5-group-10.iml" filepath="C:\Users\Mary\AndroidStudioProjects\cs328-a2-5-group-10\cs328-a2-5-group-10.iml" />
     </modules>
   </component>
 </project>

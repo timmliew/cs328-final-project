@@ -136,7 +136,8 @@ except KeyboardInterrupt:
     # occurs when the user presses Ctrl-C
     print("User Interrupt. Saving labelled data...")
     labelled_data = np.asarray(labelled_data)
-    np.savetxt("my-activity-data.csv", labelled_data, delimiter=",")
+    f = open("my-activity-data.csv",'ab')
+    np.savetxt(f, labelled_data, delimiter=",")
 finally:
     print >>sys.stderr, 'closing socket for receiving data'
     receive_socket.shutdown(socket.SHUT_RDWR)
