@@ -61,10 +61,22 @@ def predict(window):
     print("Buffer filled. Run your classifier.")
 
     # TODO: Predict class label
-    x = extract_features(window)
-    activity = classifier.predict(x)
-    onActivityDetected(activity)
 
+
+    x = extract_features(window)
+    activity = classifier.predict([x])
+    if int(activity[0]) == 0:
+        print "Walking"
+        onActivityDetected("Walking")
+    elif int(activity[0]) == 1:
+        print "Sitting"
+        onActivityDetected("Sitting")
+    elif int(activity[0]) == 2:
+        print "Jumping"
+        onActivityDetected("Jumping")
+    elif int(activity[0]) == 3:
+        print "Ascending Stairs"
+        onActivityDetected("Ascending Stairs")
     return
 
 
