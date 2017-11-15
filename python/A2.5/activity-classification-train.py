@@ -6,21 +6,21 @@ Created on Wed Sep 21 16:02:58 2016
 
 Assignment 2 : Activity Recognition
 
-This is the starter script used to train an activity recognition 
+This is the starter script used to train an activity recognition
 classifier on accelerometer data.
 
-See the assignment details for instructions. Basically you will train 
-a decision tree classifier and vary its parameters and evalute its 
-performance by computing the average accuracy, precision and recall 
-metrics over 10-fold cross-validation. You will then train another 
+See the assignment details for instructions. Basically you will train
+a decision tree classifier and vary its parameters and evalute its
+performance by computing the average accuracy, precision and recall
+metrics over 10-fold cross-validation. You will then train another
 classifier for comparison.
 
-Once you get to part 4 of the assignment, where you will collect your 
-own data, change the filename to reference the file containing the 
-data you collected. Then retrain the classifier and choose the best 
+Once you get to part 4 of the assignment, where you will collect your
+own data, change the filename to reference the file containing the
+data you collected. Then retrain the classifier and choose the best
 classifier to save to disk. This will be used in your final system.
 
-Make sure to chek the assignment details, since the instructions here are 
+Make sure to chek the assignment details, since the instructions here are
 not complete.
 
 """
@@ -91,7 +91,7 @@ feature_names = [
      "stddev mag", "min mag", "max mag",
      "fftx", "ffty", "fftz",
      "entropy"]
-class_names = ["Jogging", "Jumping"]
+class_names = ["Ascending Stairs", "Jogging", "Walking", "Sitting"]
 
 print("Extracting features and labels for window size {} and step size {}...".format(window_size, step_size))
 sys.stdout.flush()
@@ -103,14 +103,14 @@ y = np.zeros(0,)
 
 for i,window_with_timestamp_and_label in slidingWindow(data, window_size, step_size):
     # omit timestamp and label from accelerometer window for feature extraction:
-    window = window_with_timestamp_and_label[:,1:-1]  
+    window = window_with_timestamp_and_label[:,1:-1]
     # extract features over window:
     x = extract_features(window)
     # append features:
     X = np.append(X, np.reshape(x, (1,-1)), axis=0)
     # append label:
     y = np.append(y, window_with_timestamp_and_label[10, -1])
-    
+
 print("Finished feature extraction over {} windows".format(len(X)))
 print("Unique labels found: {}".format(set(y)))
 sys.stdout.flush()
