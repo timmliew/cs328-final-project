@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
+import cs.umass.edu.myactivitiestoolkit.services.GyroService;
 import cs.umass.edu.myactivitiestoolkit.view.fragments.AboutFragment;
 //import cs.umass.edu.myactivitiestoolkit.view.fragments.AudioFragment;
 import cs.umass.edu.myactivitiestoolkit.view.fragments.ExerciseFragment;
@@ -271,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tabLayout.setupWithViewPager(viewPager);
 
         txtStatus = (TextView) findViewById(R.id.status);
-
+        GyroService g = new GyroService();
         // if the activity was started by clicking a notification, then the intent contains the
         // notification ID and can be used to set the proper tab.
         if (getIntent() != null) {
@@ -338,11 +339,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         case Constants.MESSAGE.PPG_SERVICE_STOPPED:
                             showStatus(getString(R.string.ppg_stopped));
                             break;
-                        case Constants.MESSAGE.BAND_SERVICE_STARTED:
-                            showStatus(getString(R.string.band_started));
+                        case Constants.MESSAGE.GYRO_SERVICE_STARTED:
+                            showStatus(getString(R.string.gyroscope_started));
                             break;
-                        case Constants.MESSAGE.BAND_SERVICE_STOPPED:
-                            showStatus(getString(R.string.band_stopped));
+                        case Constants.MESSAGE.GYRO_SERVICE_STOPPED:
+                            showStatus(getString(R.string.gyroscope_stopped));
                             break;
                     }
                 } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_STATUS)){

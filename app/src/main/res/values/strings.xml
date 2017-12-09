@@ -10,8 +10,6 @@
 <resources>
     <string name="app_name">My Activities</string>
 
-    <string name="accelerometer_reading_format_string" formatted="false">X: %f Y: %f Z: %f </string>
-    <string name="accelerometer_reading_initial">X: — Y: — Z: — </string>
     <string name="accelerometer_started">Accelerometer Started.</string>
     <string name="accelerometer_stopped">Accelerometer Stopped.</string>
 
@@ -49,7 +47,8 @@
     <string name="about_app_version">Version %s</string>
 
     <string name="text_switch_accelerometer">Accelerometer</string>
-    <string name="text_gyroscope">Gyroscope</string>
+    <string name="text_switch_gyro">Gyroscope</string>
+    <!--<string name="text_gyroscope">Gyroscope</string>-->
     <string name="text_switch_microphone">Microphone</string>
     <string name="text_switch_heart_rate">Photoplethysmography</string>
     <string name="text_switch_gps">Location</string>

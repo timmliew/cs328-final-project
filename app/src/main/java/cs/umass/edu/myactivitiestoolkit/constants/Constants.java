@@ -84,6 +84,8 @@ public class Constants {
         int LOCATION_SERVICE_STOPPED = 7;
         int BAND_SERVICE_STARTED = 8;
         int BAND_SERVICE_STOPPED = 9;
+        int GYRO_SERVICE_STARTED = 10;
+        int GYRO_SERVICE_STOPPED = 11;
     }
 
     /** Error/warning messages displayed to the user TODO: put into string resources */

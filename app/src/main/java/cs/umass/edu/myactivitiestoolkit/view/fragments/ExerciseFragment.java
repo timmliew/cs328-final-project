@@ -41,6 +41,7 @@ import java.util.Queue;
 import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
 import cs.umass.edu.myactivitiestoolkit.services.AccelerometerService;
+import cs.umass.edu.myactivitiestoolkit.services.GyroService;
 import cs.umass.edu.myactivitiestoolkit.services.ServiceManager;
 import cs.umass.edu.myactivitiestoolkit.services.msband.BandService;
 
@@ -88,8 +89,13 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     /** The switch which toggles the {@link AccelerometerService}. **/
     private Switch switchAccelerometer;
 
+    /** The switch which toggles the {@link GyroService}. **/
+
+    private Switch switchGyro;
+
+
     /** Displays the accelerometer x, y and z-readings. **/
-    private TextView txtAccelerometerReading;
+    public static TextView txtAccelerometerReading;
 
     /** Displays the accelerometer x, y and z-readings. **/
     public static TextView txtGyroscopeReading;
@@ -105,23 +111,6 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
 
     /** Displays the activity identified by your server-side activity classification algorithm. **/
     private TextView txtActivity;
-
-//    /** The plot which displays the PPG data in real-time. **/
-//    private XYPlot mPlot;
-//
-//    /** The series formatter that defines how the x-axis signal should be displayed. **/
-//    private LineAndPointFormatter mXSeriesFormatter;
-//
-//    /** The series formatter that defines how the y-axis signal should be displayed. **/
-//    private LineAndPointFormatter mYSeriesFormatter;
-//
-//    /** The series formatter that defines how the z-axis signal should be displayed. **/
-//    private LineAndPointFormatter mZSeriesFormatter;
-//
-//    /** The series formatter that defines how the peaks should be displayed. **/
-//    private LineAndPointFormatter mPeakSeriesFormatter;
-//
-//    private SimpleXYSeries xSeries, ySeries, zSeries, peaks;
 
     /** The number of data points to display in the graph. **/
     private static final int GRAPH_CAPACITY = 100;
@@ -163,90 +152,10 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     /** Reference to the service manager which communicates to the {@link AccelerometerService}. **/
     private ServiceManager mServiceManager;
 
-    Spinner spinner;
-
-    /**
-     * The receiver listens for messages from the {@link AccelerometerService}, e.g. was the
-     * service started/stopped, and updates the status views accordingly. It also
-     * listens for sensor data and displays the sensor readings to the user.
-     *
-     * In Assignment 1 (Step detection), you should listen for intent actions indicating that
-     * a step was taken, as predicted by your server side algorithm. We already do this for the
-     * built-in and local step detection algorithms. You may display the step count in
-     * {@link #txtServerStepCount}.
-     */
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // TODO: (Assignment 1) Display the step count as predicted by your server-side algorithm, when a step event occurs
-            if (intent.getAction() != null) {
-//                float[] gyroscopeValues = intent.getFloatArrayExtra(Constants.KEY.GYRSCOPE_DATA);
-//                displayGyroscopeReading(gyroscopeValues[0], gyroscopeValues[1], gyroscopeValues[2]);
-                if (intent.getAction().equals(Constants.ACTION.BROADCAST_MESSAGE)) {
-                    int message = intent.getIntExtra(Constants.KEY.MESSAGE, -1);
-                    if (message == Constants.MESSAGE.ACCELEROMETER_SERVICE_STOPPED) {
-                        switchAccelerometer.setChecked(false);
-                    } else if (message == Constants.MESSAGE.BAND_SERVICE_STOPPED){
-                        switchAccelerometer.setChecked(false);
-                    }
-                } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_ACCELEROMETER_DATA)) {
-                    long timestamp = intent.getLongExtra(Constants.KEY.TIMESTAMP, -1);
-                    float[] accelerometerValues = intent.getFloatArrayExtra(Constants.KEY.ACCELEROMETER_DATA);
-                    displayAccelerometerReading(accelerometerValues[0], accelerometerValues[1], accelerometerValues[2]);
-
-                    mTimestamps.add(timestamp);
-//                    mXValues.add(accelerometerValues[0]);
-//                    mYValues.add(accelerometerValues[1]);
-//                    mZValues.add(accelerometerValues[2]);
-//                    xSeries.addFirst(timestamp, accelerometerValues[0]);
-//                    ySeries.addFirst(timestamp, accelerometerValues[1]);
-//                    zSeries.addFirst(timestamp, accelerometerValues[2]);
-                    if (mNumberOfPoints >= GRAPH_CAPACITY) {
-                        mTimestamps.poll();
-                        mXValues.poll();
-                        mYValues.poll();
-                        mZValues.poll();
-//                        xSeries.removeLast();
-//                        ySeries.removeLast();
-//                        zSeries.removeLast();
-                        while (mPeakTimestamps.size() > 0 && (mPeakTimestamps.peek().longValue() < mTimestamps.peek().longValue())){
-                            mPeakTimestamps.poll();
-                            mPeakValues.poll();
-//                            peaks.removeLast();
-                        }
-                    }
-                    else
-                        mNumberOfPoints++;
-
-//                    updatePlot();
-//                    mPlot.redraw();
-
-                } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_ACTIVITY)) {
-                    String activity = intent.getStringExtra(Constants.KEY.ACTIVITY);
-                    Log.d(TAG, "Received activity : " + activity);
-                    displayActivity(activity);
-                } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_ACCELEROMETER_PEAK)){
-                    long timestamp = intent.getLongExtra(Constants.KEY.ACCELEROMETER_PEAK_TIMESTAMP, -1);
-//                    float[] values = intent.getFloatArrayExtra(Constants.KEY.ACCELEROMETER_PEAK_VALUE);
-                    if (timestamp > 0) {
-                        mPeakTimestamps.add(timestamp);
-                        mPeakValues.add(0); //place on z-axis signa`l
-//                        peaks.addFirst(timestamp, 0);
-                    }
-                }
-            }
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mServiceManager = ServiceManager.getInstance(getActivity());
-
-//        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
-//        View layout = inflater.inflate(R.layout.fragment_exercise, null);
-//        Spinner spinner = (Spinner)layout.findViewById(R.id.spinner_activity);
-//        spinner.setOnItemSelectedListener(this);
 
     }
 
@@ -259,31 +168,27 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         txtAccelerometerReading = (TextView) view.findViewById(R.id.txtAccelerometerReading);
         txtGyroscopeReading = (TextView) view.findViewById(R.id.txtGyroscopeReading);
 
-
-        //obtain references to the on/off switches and handle the toggling appropriately
         switchAccelerometer = (Switch) view.findViewById(R.id.switchAccelerometer);
         switchAccelerometer.setChecked(mServiceManager.isServiceRunning(AccelerometerService.class));
         switchAccelerometer.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean enabled) {
                 if (enabled){
-//                    clearPlotData();
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    boolean runOverMSBand = preferences.getBoolean(getString(R.string.pref_msband_key),
-                            getResources().getBoolean(R.bool.pref_msband_default));
-                    if (runOverMSBand){
-                        mServiceManager.startSensorService(BandService.class);
-                    }else{
-                        mServiceManager.startSensorService(AccelerometerService.class);
-                    }
-                }else{
-
-                    Log.d(TAG, "found spinner");
-
+                    mServiceManager.startSensorService(AccelerometerService.class);
+                } else {
                     mServiceManager.stopSensorService(AccelerometerService.class);
-                    mServiceManager.stopSensorService(BandService.class);
-
-
+                }
+            }
+        });
+        switchGyro= (Switch) view.findViewById(R.id.switchGyro);
+        switchGyro.setChecked(mServiceManager.isServiceRunning(GyroService.class));
+        switchGyro.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean enabled) {
+                if (enabled){
+                    mServiceManager.startSensorService(GyroService.class);
+                } else {
+                    mServiceManager.stopSensorService(GyroService.class);
                 }
             }
         });
@@ -291,66 +196,15 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         return view;
     }
 
-    /**
-     * When the fragment starts, register a {@link #receiver} to receive messages from the
-     * {@link AccelerometerService}. The intent filter defines messages we are interested in receiving.
-     * <br><br>
-     *
-     * We would like to receive sensor data, so we specify {@link Constants.ACTION#BROADCAST_ACCELEROMETER_DATA}.
-     * We would also like to receive step count updates, so include {@link Constants.ACTION#BROADCAST_ANDROID_STEP_COUNT}
-     * and {@link Constants.ACTION#BROADCAST_LOCAL_STEP_COUNT}.
-     * <br><br>
-     *
-     * To optionally display the peak values you compute, include
-     * {@link Constants.ACTION#BROADCAST_ACCELEROMETER_PEAK}.
-     * <br><br>
-     *
-     * Lastly to update the state of the accelerometer switch properly, we listen for additional
-     * messages, using {@link Constants.ACTION#BROADCAST_MESSAGE}.
-     *
-     * @see Constants.ACTION
-     * @see IntentFilter
-     * @see LocalBroadcastManager
-     * @see #receiver
-     */
     @Override
     public void onStart() {
         super.onStart();
 
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Constants.ACTION.BROADCAST_MESSAGE);
-        filter.addAction(Constants.ACTION.BROADCAST_ACCELEROMETER_DATA);
-        filter.addAction(Constants.ACTION.BROADCAST_ACCELEROMETER_PEAK);
-        filter.addAction(Constants.ACTION.BROADCAST_ACTIVITY);
-        filter.addAction(Constants.ACTION.BROADCAST_ANDROID_STEP_COUNT);
-        filter.addAction(Constants.ACTION.BROADCAST_LOCAL_STEP_COUNT);
-        filter.addAction(Constants.ACTION.BROADCAST_SERVER_STEP_COUNT);
-        broadcastManager.registerReceiver(receiver, filter);
 
-//        //labels spinner
-//        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
-//        View layout = inflater.inflate(R.layout.fragment_exercise, null);
-//        spinner = (Spinner)layout.findViewById(R.id.spinner_activity);
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-//                R.array.labels_array, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(adapter);
-//        spinner.setOnItemSelectedListener(this);
     }
 
-    /**
-     * When the fragment stops, e.g. the user closes the application or opens a new activity,
-     * then we should unregister the {@link #receiver}.
-     */
     @Override
     public void onStop() {
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        try {
-            broadcastManager.unregisterReceiver(receiver);
-        }catch (IllegalArgumentException e){
-            e.printStackTrace();
-        }
         super.onStop();
     }
 
@@ -364,7 +218,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                txtAccelerometerReading.setText(String.format(Locale.getDefault(), getActivity().getString(R.string.accelerometer_reading_format_string), x, y, z));
+                txtAccelerometerReading.setText("X: " + x);
 
             }
         });
@@ -374,75 +228,8 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         txtGyroscopeReading.setText("X: " + x);
     }
 
-    /**
-     * Displays the step count as computed by your local step detection algorithm.
-     * @param stepCount the number of steps taken since the service started
-     */
-    private void displayLocalStepCount(final int stepCount){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtLocalStepCount.setText(String.format(Locale.getDefault(), getString(R.string.local_step_count), stepCount));
-            }
-        });
-    }
 
 
-
-    /**
-     * Displays the activity predicted by the server-side classifier.
-     * @param activity the current activity being performed.
-     */
-    private void displayActivity(final String activity){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtActivity.setText(activity);
-            }
-        });
-    }
-
-
-    /**
-     * Clears the x, y, z and peak plot data series.
-     */
-//    private void clearPlotData(){
-//        mPeakTimestamps.clear();
-//        mPeakValues.clear();
-//        mTimestamps.clear();
-//        mXValues.clear();
-//        mYValues.clear();
-//        mZValues.clear();
-//        mNumberOfPoints = 0;
-//
-//        int dataSize = xSeries.size();
-//        for (int i = 0; i < dataSize; i++)
-//        {
-//            xSeries.removeLast();
-//            ySeries.removeLast();
-//            zSeries.removeLast();
-//        }
-//
-//        int peakSize = peaks.size();
-//        for (int i = 0; i < peakSize; i++)
-//            peaks.removeLast();
-//
-//        mPlot.redraw();
-//    }
-
-    /**
-     * Updates and redraws the accelerometer plot, along with the peaks detected.
-     */
-//    private void updatePlot(){
-
-        //redraw the plot:
-//        mPlot.clear();
-//        mPlot.addSeries(xSeries, mXSeriesFormatter);
-//        mPlot.addSeries(ySeries, mYSeriesFormatter);
-//        mPlot.addSeries(zSeries, mZSeriesFormatter);
-//        mPlot.addSeries(peaks, mPeakSeriesFormatter);
-//        mPlot.redraw();
-//    }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view,
