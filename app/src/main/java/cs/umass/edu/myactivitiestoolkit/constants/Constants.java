@@ -39,6 +39,7 @@ public class Constants {
      */
     public interface NOTIFICATION_ID {
         int ACCELEROMETER_SERVICE = 101;
+        int GYROSCOPE_SERVICE = 105;
         int PPG_SERVICE = 102;
         int LOCATION_SERVICE = 103;
         int AUDIO_SERVICE = 104;
@@ -53,6 +54,8 @@ public class Constants {
         String TIMESTAMP = "edu.umass.cs.my-activities-toolkit.key.ppg-timestamp";
 
         String ACCELEROMETER_DATA = "edu.umass.cs.my-activities-toolkit.key.accelerometer-data";
+        String GYRSCOPE_DATA = "edu.umass.cs.my-activities-toolkit.key.gyroscope-data";
+
         String ACCELEROMETER_PEAK_TIMESTAMP = "edu.umass.cs.my-activities-toolkit.key.accelerometer-peak-timestamp";
         String ACCELEROMETER_PEAK_VALUE = "edu.umass.cs.my-activities-toolkit.key.accelerometer-peak-value";
         String STEP_COUNT = "edu.umass.cs.my-activities-toolkit.key.step-count";

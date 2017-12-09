@@ -13,8 +13,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
+import android.os.Bundle;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +24,7 @@ import cs.umass.edu.myactivitiestoolkit.R;
 import cs.umass.edu.myactivitiestoolkit.constants.Constants;
 import cs.umass.edu.myactivitiestoolkit.steps.StepDetector;
 import cs.umass.edu.myactivitiestoolkit.view.activities.MainActivity;
+import cs.umass.edu.myactivitiestoolkit.view.fragments.ExerciseFragment;
 import edu.umass.cs.MHLClient.client.MessageReceiver;
 import edu.umass.cs.MHLClient.client.MobileIOClient;
 import edu.umass.cs.MHLClient.sensors.AccelerometerReading;
@@ -94,22 +96,11 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     /** Sensor Manager object for registering and unregistering system sensors */
     private SensorManager mSensorManager;
 
+
     /** Manages the physical accelerometer sensor on the phone. */
     private Sensor mAccelerometerSensor;
 
-    /** Android built-in step detection sensor **/
-    private Sensor mStepSensor;
-
-    /** Defines your step detection algorithm. **/
-    private final StepDetector mStepDetector;
-
-    /** The step count as predicted by the Android built-in step detection algorithm. */
-    private int mAndroidStepCount = 0;
-
-    /**
-     * The step count as predicted by your server-side step detection algorithm.
-     */
-    private int serverStepCount = 0;
+    private Sensor mGyroscopeSensor;
 
     /** The spinner containing the activity label. */
     Spinner spinner;
@@ -117,10 +108,13 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     /** The activity label for data collection. */
     String label = "";
 
-
-    public AccelerometerService(){
-        mStepDetector = new StepDetector();
+    public void onCreate(Bundle savedInstanceState)
+    {
+        //get a hook to the sensor service
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
+
 
     @Override
     protected void onServiceStarted() {
@@ -145,6 +139,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
         localBroadcastManager.registerReceiver(receiver, new IntentFilter("LABEL"));
+        mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_FASTEST);
 
     }
 
@@ -171,8 +166,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
                     JSONObject data = json.getJSONObject("data");
                     long timestamp = data.getLong("timestamp");
                     Log.d(TAG, "Step occurred at " + timestamp + ".");
-                    serverStepCount++;
-                    broadcastServerStepCount(serverStepCount);
                     broadcastStepDetected(timestamp);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -203,7 +196,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
         //TODO : (Assignment 0) Register the accelerometer sensor from the sensor manager.
     }
 
@@ -266,6 +258,8 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        ExerciseFragment.txtGyroscopeReading.setText(" X: " + Float.toString(event.values[0])
+                + " Y: " + Float.toString(event.values[1]) + " Z: " + Float.toString(event.values[2]));
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             // convert the timestamp to milliseconds (note this is not in Unix time)
@@ -275,7 +269,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             if (!(label.equals("") || label.equals("Label"))) {
                 labelInt = Integer.parseInt("" + label.charAt(0));
             }
-            mClient.sendSensorReading(new AccelerometerReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, labelInt, event.values));
+//            mClient.sendSensorReading(new AccelerometerReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, labelInt, event.values));
 
 //            //TODO: Send the accelerometer reading to the server
 //            mClient.sendSensorReading(new AccelerometerReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, event.values));
@@ -287,11 +281,26 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 //            broadcastStepDetected(timestamp_in_milliseconds, event.values);
 
 
+        }else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+            // convert the timestamp to milliseconds (note this is not in Unix time)
+            long timestamp_in_milliseconds = (long) ((double) event.timestamp / Constants.TIMESTAMPS.NANOSECONDS_PER_MILLISECOND);
 
-        }else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+            int labelInt = -1;
+            if (!(label.equals("") || label.equals("Label"))) {
+                labelInt = Integer.parseInt("" + label.charAt(0));
+            }
+//            mClient.sendSensorReading(new AccelerometerReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, labelInt, event.values));
 
-            // we received a step event detected by the built-in Android step detector (assignment 1)
-            broadcastAndroidStepCount(mAndroidStepCount++);
+//            //TODO: Send the accelerometer reading to the server
+//            mClient.sendSensorReading(new AccelerometerReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, event.values));
+
+            //TODO: broadcast the accelerometer reading to the UI
+            broadcastAccelerometerReading(timestamp_in_milliseconds, event.values);
+
+            //TODO: (Assignment 1) Call the detectSteps method in the StepDetector class
+//            broadcastStepDetected(timestamp_in_milliseconds, event.values);
+
+
 
         } else {
 

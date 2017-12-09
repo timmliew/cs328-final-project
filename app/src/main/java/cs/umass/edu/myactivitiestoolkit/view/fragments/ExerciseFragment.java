@@ -22,13 +22,13 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.androidplot.util.PixelUtils;
-import com.androidplot.xy.BoundaryMode;
-import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.SimpleXYSeries;
-import com.androidplot.xy.StepMode;
-import com.androidplot.xy.XYGraphWidget;
-import com.androidplot.xy.XYPlot;
+//import com.androidplot.util.PixelUtils;
+//import com.androidplot.xy.BoundaryMode;
+//import com.androidplot.xy.LineAndPointFormatter;
+//import com.androidplot.xy.SimpleXYSeries;
+//import com.androidplot.xy.StepMode;
+//import com.androidplot.xy.XYGraphWidget;
+//import com.androidplot.xy.XYPlot;
 
 import java.text.FieldPosition;
 import java.text.Format;
@@ -77,7 +77,6 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
  * @author CS390MB
  *
  * @see AccelerometerService
- * @see XYPlot
  * @see Fragment
  */
 public class ExerciseFragment extends Fragment implements AdapterView.OnItemSelectedListener {
@@ -92,6 +91,9 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     /** Displays the accelerometer x, y and z-readings. **/
     private TextView txtAccelerometerReading;
 
+    /** Displays the accelerometer x, y and z-readings. **/
+    public static TextView txtGyroscopeReading;
+
     /** Displays the step count computed by the built-in Android step detector. **/
     private TextView txtAndroidStepCount;
 
@@ -104,22 +106,22 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     /** Displays the activity identified by your server-side activity classification algorithm. **/
     private TextView txtActivity;
 
-    /** The plot which displays the PPG data in real-time. **/
-    private XYPlot mPlot;
-
-    /** The series formatter that defines how the x-axis signal should be displayed. **/
-    private LineAndPointFormatter mXSeriesFormatter;
-
-    /** The series formatter that defines how the y-axis signal should be displayed. **/
-    private LineAndPointFormatter mYSeriesFormatter;
-
-    /** The series formatter that defines how the z-axis signal should be displayed. **/
-    private LineAndPointFormatter mZSeriesFormatter;
-
-    /** The series formatter that defines how the peaks should be displayed. **/
-    private LineAndPointFormatter mPeakSeriesFormatter;
-
-    private SimpleXYSeries xSeries, ySeries, zSeries, peaks;
+//    /** The plot which displays the PPG data in real-time. **/
+//    private XYPlot mPlot;
+//
+//    /** The series formatter that defines how the x-axis signal should be displayed. **/
+//    private LineAndPointFormatter mXSeriesFormatter;
+//
+//    /** The series formatter that defines how the y-axis signal should be displayed. **/
+//    private LineAndPointFormatter mYSeriesFormatter;
+//
+//    /** The series formatter that defines how the z-axis signal should be displayed. **/
+//    private LineAndPointFormatter mZSeriesFormatter;
+//
+//    /** The series formatter that defines how the peaks should be displayed. **/
+//    private LineAndPointFormatter mPeakSeriesFormatter;
+//
+//    private SimpleXYSeries xSeries, ySeries, zSeries, peaks;
 
     /** The number of data points to display in the graph. **/
     private static final int GRAPH_CAPACITY = 100;
@@ -178,6 +180,8 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         public void onReceive(Context context, Intent intent) {
             // TODO: (Assignment 1) Display the step count as predicted by your server-side algorithm, when a step event occurs
             if (intent.getAction() != null) {
+//                float[] gyroscopeValues = intent.getFloatArrayExtra(Constants.KEY.GYRSCOPE_DATA);
+//                displayGyroscopeReading(gyroscopeValues[0], gyroscopeValues[1], gyroscopeValues[2]);
                 if (intent.getAction().equals(Constants.ACTION.BROADCAST_MESSAGE)) {
                     int message = intent.getIntExtra(Constants.KEY.MESSAGE, -1);
                     if (message == Constants.MESSAGE.ACCELEROMETER_SERVICE_STOPPED) {
@@ -191,41 +195,32 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
                     displayAccelerometerReading(accelerometerValues[0], accelerometerValues[1], accelerometerValues[2]);
 
                     mTimestamps.add(timestamp);
-                    mXValues.add(accelerometerValues[0]);
-                    mYValues.add(accelerometerValues[1]);
-                    mZValues.add(accelerometerValues[2]);
-                    xSeries.addFirst(timestamp, accelerometerValues[0]);
-                    ySeries.addFirst(timestamp, accelerometerValues[1]);
-                    zSeries.addFirst(timestamp, accelerometerValues[2]);
+//                    mXValues.add(accelerometerValues[0]);
+//                    mYValues.add(accelerometerValues[1]);
+//                    mZValues.add(accelerometerValues[2]);
+//                    xSeries.addFirst(timestamp, accelerometerValues[0]);
+//                    ySeries.addFirst(timestamp, accelerometerValues[1]);
+//                    zSeries.addFirst(timestamp, accelerometerValues[2]);
                     if (mNumberOfPoints >= GRAPH_CAPACITY) {
                         mTimestamps.poll();
                         mXValues.poll();
                         mYValues.poll();
                         mZValues.poll();
-                        xSeries.removeLast();
-                        ySeries.removeLast();
-                        zSeries.removeLast();
+//                        xSeries.removeLast();
+//                        ySeries.removeLast();
+//                        zSeries.removeLast();
                         while (mPeakTimestamps.size() > 0 && (mPeakTimestamps.peek().longValue() < mTimestamps.peek().longValue())){
                             mPeakTimestamps.poll();
                             mPeakValues.poll();
-                            peaks.removeLast();
+//                            peaks.removeLast();
                         }
                     }
                     else
                         mNumberOfPoints++;
 
 //                    updatePlot();
-                    mPlot.redraw();
+//                    mPlot.redraw();
 
-                } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_ANDROID_STEP_COUNT)) {
-                    int stepCount = intent.getIntExtra(Constants.KEY.STEP_COUNT, 0);
-                    displayAndroidStepCount(stepCount);
-                } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_LOCAL_STEP_COUNT)) {
-                    int stepCount = intent.getIntExtra(Constants.KEY.STEP_COUNT, 0);
-                    displayLocalStepCount(stepCount);
-                } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_SERVER_STEP_COUNT)) {
-                    int stepCount = intent.getIntExtra(Constants.KEY.STEP_COUNT, 0);
-                    displayServerStepCount(stepCount);
                 } else if (intent.getAction().equals(Constants.ACTION.BROADCAST_ACTIVITY)) {
                     String activity = intent.getStringExtra(Constants.KEY.ACTIVITY);
                     Log.d(TAG, "Received activity : " + activity);
@@ -235,8 +230,8 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
 //                    float[] values = intent.getFloatArrayExtra(Constants.KEY.ACCELEROMETER_PEAK_VALUE);
                     if (timestamp > 0) {
                         mPeakTimestamps.add(timestamp);
-                        mPeakValues.add(0); //place on z-axis signal
-                        peaks.addFirst(timestamp, 0);
+                        mPeakValues.add(0); //place on z-axis signa`l
+//                        peaks.addFirst(timestamp, 0);
                     }
                 }
             }
@@ -262,31 +257,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
 
         //obtain a reference to the accelerometer reading text field
         txtAccelerometerReading = (TextView) view.findViewById(R.id.txtAccelerometerReading);
-
-        //obtain references to the step count text fields
-//        txtAndroidStepCount = (TextView) view.findViewById(R.id.txtAndroidStepCount);
-//        txtLocalStepCount = (TextView) view.findViewById(R.id.txtLocalStepCount);
-//        txtServerStepCount = (TextView) view.findViewById(R.id.txtServerStepCount);
-
-        //obtain reference to the activity text field
-        txtActivity = (TextView) view.findViewById(R.id.txtActivity);
-
-        //labels spinner
-        spinner = (Spinner)view.findViewById(R.id.spinner_activity);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.labels_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        //labels spinner
-//        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
-//        View layout = inflater.inflate(R.layout.fragment_exercise, null);
-//        spinner = (Spinner)layout.findViewById(R.id.spinner_activity);
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-//                R.array.labels_array, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
+        txtGyroscopeReading = (TextView) view.findViewById(R.id.txtGyroscopeReading);
 
 
         //obtain references to the on/off switches and handle the toggling appropriately
@@ -296,8 +267,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean enabled) {
                 if (enabled){
-                    clearPlotData();
-
+//                    clearPlotData();
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     boolean runOverMSBand = preferences.getBoolean(getString(R.string.pref_msband_key),
                             getResources().getBoolean(R.bool.pref_msband_default));
@@ -317,49 +287,6 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
                 }
             }
         });
-
-        // initialize plot and set plot parameters
-        mPlot = (XYPlot) view.findViewById(R.id.accelerometerPlot);
-        mPlot.setRangeBoundaries(-30, 30, BoundaryMode.FIXED);
-        mPlot.setRangeStep(StepMode.SUBDIVIDE, 5);
-        mPlot.getGraph().getDomainOriginLinePaint().setColor(Color.TRANSPARENT);
-        mPlot.getGraph().getDomainGridLinePaint().setColor(Color.TRANSPARENT);
-        mPlot.getGraph().getRangeGridLinePaint().setColor(Color.TRANSPARENT);
-        mPlot.setDomainStep(StepMode.SUBDIVIDE, 1);
-
-        // To remove the x labels, just set each label to an empty string:
-        mPlot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat(new Format() {
-            @Override
-            public StringBuffer format(Object obj, @NonNull StringBuffer toAppendTo, @NonNull FieldPosition pos) {
-                return toAppendTo.append("");
-            }
-            @Override
-            public Object parseObject(String source, @NonNull ParsePosition pos) {
-                return null;
-            }
-        });
-        mPlot.setPlotPaddingBottom(-150); //TODO: This isn't device-dependent, might need to be changed if the plot/legend is cut off
-        mPlot.getLegend().setPaddingBottom(280);
-
-        // set formatting parameters for each signal (accelerometer and accelerometer peaks)
-        mXSeriesFormatter = new LineAndPointFormatter(Color.RED, null, null, null);
-        mYSeriesFormatter = new LineAndPointFormatter(Color.GREEN, null, null, null);
-        mZSeriesFormatter = new LineAndPointFormatter(Color.BLUE, null, null, null);
-
-        mPeakSeriesFormatter = new LineAndPointFormatter(null, Color.BLUE, null, null);
-        mPeakSeriesFormatter.getVertexPaint().setStrokeWidth(PixelUtils.dpToPix(10)); //enlarge the peak points
-
-        xSeries = new SimpleXYSeries(new ArrayList<>(mTimestamps), new ArrayList<>(mXValues), "X");
-        ySeries = new SimpleXYSeries(new ArrayList<>(mTimestamps), new ArrayList<>(mYValues), "Y");
-        zSeries = new SimpleXYSeries(new ArrayList<>(mTimestamps), new ArrayList<>(mZValues), "Z");
-
-        peaks = new SimpleXYSeries(new ArrayList<>(mPeakTimestamps), new ArrayList<>(mPeakValues), "PEAKS");
-
-        mPlot.addSeries(xSeries, mXSeriesFormatter);
-        mPlot.addSeries(ySeries, mYSeriesFormatter);
-        mPlot.addSeries(zSeries, mZSeriesFormatter);
-        mPlot.addSeries(peaks, mPeakSeriesFormatter);
-        mPlot.redraw();
 
         return view;
     }
@@ -438,8 +365,13 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
             @Override
             public void run() {
                 txtAccelerometerReading.setText(String.format(Locale.getDefault(), getActivity().getString(R.string.accelerometer_reading_format_string), x, y, z));
+
             }
         });
+    }
+
+    public static void displayGyroscopeReading(final float x, final float y, final float z){
+        txtGyroscopeReading.setText("X: " + x);
     }
 
     /**
@@ -455,31 +387,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         });
     }
 
-    /**
-     * Displays the step count as computed by the Android built-in step detection algorithm.
-     * @param stepCount the number of steps taken since the service started
-     */
-    private void displayAndroidStepCount(final int stepCount){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtAndroidStepCount.setText(String.format(Locale.getDefault(), getString(R.string.android_step_count), stepCount));
-            }
-        });
-    }
 
-    /**
-     * Displays the step count as computed by your server-side step detection algorithm.
-     * @param stepCount the number of steps taken since the service started
-     */
-    private void displayServerStepCount(final int stepCount){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtServerStepCount.setText(String.format(Locale.getDefault(), getString(R.string.server_step_count), stepCount));
-            }
-        });
-    }
 
     /**
      * Displays the activity predicted by the server-side classifier.
@@ -498,34 +406,34 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     /**
      * Clears the x, y, z and peak plot data series.
      */
-    private void clearPlotData(){
-        mPeakTimestamps.clear();
-        mPeakValues.clear();
-        mTimestamps.clear();
-        mXValues.clear();
-        mYValues.clear();
-        mZValues.clear();
-        mNumberOfPoints = 0;
-
-        int dataSize = xSeries.size();
-        for (int i = 0; i < dataSize; i++)
-        {
-            xSeries.removeLast();
-            ySeries.removeLast();
-            zSeries.removeLast();
-        }
-
-        int peakSize = peaks.size();
-        for (int i = 0; i < peakSize; i++)
-            peaks.removeLast();
-
-        mPlot.redraw();
-    }
+//    private void clearPlotData(){
+//        mPeakTimestamps.clear();
+//        mPeakValues.clear();
+//        mTimestamps.clear();
+//        mXValues.clear();
+//        mYValues.clear();
+//        mZValues.clear();
+//        mNumberOfPoints = 0;
+//
+//        int dataSize = xSeries.size();
+//        for (int i = 0; i < dataSize; i++)
+//        {
+//            xSeries.removeLast();
+//            ySeries.removeLast();
+//            zSeries.removeLast();
+//        }
+//
+//        int peakSize = peaks.size();
+//        for (int i = 0; i < peakSize; i++)
+//            peaks.removeLast();
+//
+//        mPlot.redraw();
+//    }
 
     /**
      * Updates and redraws the accelerometer plot, along with the peaks detected.
      */
-    private void updatePlot(){
+//    private void updatePlot(){
 
         //redraw the plot:
 //        mPlot.clear();
@@ -534,7 +442,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
 //        mPlot.addSeries(zSeries, mZSeriesFormatter);
 //        mPlot.addSeries(peaks, mPeakSeriesFormatter);
 //        mPlot.redraw();
-    }
+//    }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view,
@@ -543,21 +451,21 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         // parent.getItemAtPosition(pos)
 
 //        label = parent.getItemAtPosition(pos).toString();
-        Log.i(TAG, "got label " + parent.getItemAtPosition(pos));
+//        Log.i(TAG, "got label " + parent.getItemAtPosition(pos));
 
 
 
-        Intent labelIntent = new Intent("LABEL");
+//        Intent labelIntent = new Intent("LABEL");
 
 
-        if (pos >= 0) {
-            labelIntent.putExtra("LABEL", parent.getItemAtPosition(pos).toString());
-        } else {
-            labelIntent.putExtra("LABEL", "-1");
-        }
-
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        localBroadcastManager.sendBroadcast(labelIntent);
+//        if (pos >= 0) {
+//            labelIntent.putExtra("LABEL", parent.getItemAtPosition(pos).toString());
+//        } else {
+//            labelIntent.putExtra("LABEL", "-1");
+//        }
+//
+//        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+//        localBroadcastManager.sendBroadcast(labelIntent);
 
     }
 

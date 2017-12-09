@@ -14,6 +14,12 @@
     <string name="accelerometer_reading_initial">X: — Y: — Z: — </string>
     <string name="accelerometer_started">Accelerometer Started.</string>
     <string name="accelerometer_stopped">Accelerometer Stopped.</string>
+
+    <!--<string name="gyroscope_reading_format_string" formatted="false">X: %f Y: %f Z: %f </string>-->
+    <!--<string name="gyroscope_reading_initial">X: — Y: — Z: — </string>-->
+    <string name="gyroscope_started">Gyroscope Started.</string>
+    <string name="gyroscope_stopped">Gyroscope Stopped.</string>
+
     <string name="audio_started">Microphone Started.</string>
     <string name="audio_stopped">Microphone Stopped.</string>
     <string name="location_started">Location Started.</string>
@@ -43,17 +49,11 @@
     <string name="about_app_version">Version %s</string>
 
     <string name="text_switch_accelerometer">Accelerometer</string>
+    <string name="text_gyroscope">Gyroscope</string>
     <string name="text_switch_microphone">Microphone</string>
     <string name="text_switch_heart_rate">Photoplethysmography</string>
     <string name="text_switch_gps">Location</string>
 
     <string name="app_details">CS390MB : Mobile Health Sensing</string>
 
-    <string-array name="labels_array">
-        <item>Label</item>
-        <item>0 - Walking</item>
-        <item>1 - Sitting</item>
-        <item>2 - Jumping</item>
-        <item>3 - Ascending Stairs</item>
-    </string-array>
 </resources>
