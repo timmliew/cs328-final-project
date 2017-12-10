@@ -1,28 +1,21 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Sep 21 16:02:58 2016
-
 @author: cs390mb
-
 Assignment 2 : Activity Recognition
-
 This is the starter script used to train an activity recognition
 classifier on accelerometer data.
-
 See the assignment details for instructions. Basically you will train
 a decision tree classifier and vary its parameters and evalute its
 performance by computing the average accuracy, precision and recall
 metrics over 10-fold cross-validation. You will then train another
 classifier for comparison.
-
 Once you get to part 4 of the assignment, where you will collect your
 own data, change the filename to reference the file containing the
 data you collected. Then retrain the classifier and choose the best
 classifier to save to disk. This will be used in your final system.
-
 Make sure to chek the assignment details, since the instructions here are
 not complete.
-
 """
 
 import os

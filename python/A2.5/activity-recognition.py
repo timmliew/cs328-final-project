@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Sep  7 15:34:11 2016
-
 Assignment A0 : Data Collection
-
 @author: cs390mb
-
 This Python script receives incoming unlabelled accelerometer data through
 the server and uses your trained classifier to predict its class label.
 The label is then sent back to the Android application via the server.
-
 """
 
 import socket
@@ -20,6 +16,8 @@ import numpy as np
 import pickle
 from features import extract_features # make sure features.py is in the same directory
 from util import reorient, reset_vars
+import time
+import matplotlib.pyplot as plt
 
 # TODO: Replace the string with your user ID
 user_id = "102017"
@@ -44,13 +42,29 @@ if classifier == None:
     print("Classifier is null; make sure you have trained it!")
     sys.exit()
 
-def onActivityDetected(activity):
+
+def expectedposition(curtime):
+    timediff = curtime
+    if timediff < MOVETOHORNSUP:
+        return "Attention"
+    elif timediff < MOVETOATTENTION:
+        return "Horns Up"
+    elif timediff < MOVETOTRAILARMS:
+        return "Attention"
+    elif timediff < ENDTIME:
+        return "Trail Arms"
+    else:
+        return "none"
+
+def onActivityDetected(actualactivity, expectedactivity):
     """
     Notifies the client of the current activity
     """
+
+    ## use this to send buzz or sound that the person is in the wrong position
     send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'ACTIVITY_DETECTED', 'data': {'expectedactivity' : expectedactivity, 'actualactivity': actualactivity}}) + "\n")
 
-def predict(window):
+def predict(window, runreview):
     """
     Given a window of accelerometer data, predict the activity label.
     Then use the onActivityDetected(activity) function to notify the
@@ -60,26 +74,31 @@ def predict(window):
 
     print("Buffer filled. Run your classifier.")
 
-    # TODO: Predict class label
-
+    curtime = time.time()
 
     x = extract_features(window)
     activity = classifier.predict([x])
+    actualpos = ''
+    exppos = expectedposition(curtime)
     if int(activity[0]) == 0:
-        print "Walking"
-        onActivityDetected("Walking")
+        print "Attention"
+        onActivityDetected("Attention", exppos)
+        actualpos = "Attention"
     elif int(activity[0]) == 1:
-        print "Sitting"
-        onActivityDetected("Sitting")
+        print "HornsUp"
+        onActivityDetected("HornsUp", exppos)
+        actualpos = "HornsUp"
     elif int(activity[0]) == 2:
-        print "Jumping"
-        onActivityDetected("Jumping")
-    elif int(activity[0]) == 3:
-        print "Ascending Stairs"
-        onActivityDetected("Ascending Stairs")
+        print "TrailArms"
+        onActivityDetected("TrailArms", exppos)
+        actualpos = "TrailArms"
+
+    # append here actual verus expected
+    runreview["actual"]["x"].append(curtime)
+    runreview["actual"]["y"].append(actualpos)
+    runreview["expected"]["x"].append(curtime)
+    runreview["expected"]["y"].append(exppos)
     return
-
-
 
 #################   Server Connection Code  ####################
 
@@ -98,7 +117,6 @@ msg_acknowledge_id = "ACK"
 def authenticate(sock):
     """
     Authenticates the user by performing a handshake with the data collection server.
-
     If it fails, it will raise an appropriate exception.
     """
     message = sock.recv(256).strip()
@@ -145,12 +163,26 @@ try:
     previous_json = ''
 
     sensor_data = []
-    window_size = 25 # ~1 sec assuming 25 Hz sampling rate
-    step_size = 25 # no overlap
+    window_size = 10 # ~1 sec assuming 25 Hz sampling rate
+    step_size = 10 # no overlap
     index = 0 # to keep track of how many samples we have buffered so far
     reset_vars() # resets orientation variables
 
-    while True:
+    # set up timer to see what the activity should be vs what it is
+    #start tracking motions
+    STARTTIME = time.time()
+    # starts in attention position for 5 seconds, keep clicks going
+    MOVETOHORNSUP = STARTTIME + 5
+    # from horns up position move back to attention for 5 seconds, keep clicks going
+    MOVETOATTENTION = MOVETOHORNSUP + 5
+    # from attention position move to trail arms for 5 seconds, keep clicks going
+    MOVETOTRAILARMS = MOVETOATTENTION + 5
+    # end the exercise
+    ENDTIME = MOVETOTRAILARMS + 5
+
+    runreview = {"actual": {"x":[], "y":[]}, "expected": {"x":[], "y":[]}}
+
+    while (time.time() < ENDTIME):
         try:
             message = receive_socket.recv(1024).strip()
             json_strings = message.split("\n")
@@ -176,7 +208,7 @@ try:
                         sensor_data.pop(0)
 
                     if (index >= step_size and len(sensor_data) == window_size):
-                        t = threading.Thread(target=predict, args=(np.asarray(sensor_data[:]),))
+                        t = threading.Thread(target=predict, args=(np.asarray(sensor_data[:]),runreview,))
                         t.start()
                         index = 0
 
@@ -192,6 +224,17 @@ try:
             if (e.message != "timed out"):  # ignore timeout exceptions completely
                 print(e)
             pass
+
+    # use runreview down here to generate plot
+
+    plt.figure()
+    plt.plot(runreview["actual"]["x"], runreview["actual"]["y"], label="Actual")
+    plt.plot(runreview["expected"]["x"], runreview["expected"]["y"], label="Expected")
+    plt.title("Review of Run")
+    plt.xlabel("Time")
+    plt.ylabel("Position")
+    plt.show()
+
 except KeyboardInterrupt:
     # occurs when the user presses Ctrl-C
     print("User Interrupt. Qutting...")
