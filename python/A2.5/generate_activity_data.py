@@ -7,19 +7,19 @@ Created on Wed Sep 14 10:40:38 2016
 Assignment A2 : Activity Recognition
 Part 1 : Supervised Classification
 
-This script generates noisy average and maximum speed data for 
-walking, running and biking and plots the datapoints along with 
-the decision boundary of a trained Suport Vector Machine (SVM) 
+This script generates noisy average and maximum speed data for
+walking, running and biking and plots the datapoints along with
+the decision boundary of a trained Suport Vector Machine (SVM)
 classifier.
 
-Note that this data is generated using means and standard deviations that 
-are not entirely realistic. When you collect actual data, you will likely 
-find that it is not as clean, i.e. there is more class overlap and therefore 
+Note that this data is generated using means and standard deviations that
+are not entirely realistic. When you collect actual data, you will likely
+find that it is not as clean, i.e. there is more class overlap and therefore
 more ambiguity.
 
-Run this script to visualize the generated data, each data point colored 
-according to the corresponding activity. Change the variable n_samples 
-to be much smaller (~10 samples) and much larger (> 1000 samples) and 
+Run this script to visualize the generated data, each data point colored
+according to the corresponding activity. Change the variable n_samples
+to be much smaller (~10 samples) and much larger (> 1000 samples) and
 see how the decision boundaries change.
 
 Refer to the assignment details on what you need to do here.
@@ -47,9 +47,9 @@ from sklearn import cross_validation
 n_samples = 100 # number of data points per activity
 n_dim = 2 # number of feature dimensions; 2 for this example so that we can visualize
 
-# for each activity, we specify the expected max, expected average and the standard deviation  
+# for each activity, we specify the expected max, expected average and the standard deviation
 # for simplicity the stddev is the same for both the max and average features.
-stats = {'walking' : {'expected_max' : 7.0, 'expected_average' : 3.1, 'stddev' : 1.25, 'samples' : [], 'format' : 'ro'}, 
+stats = {'walking' : {'expected_max' : 7.0, 'expected_average' : 3.1, 'stddev' : 1.25, 'samples' : [], 'format' : 'ro'},
          'running' : {'expected_max' : 10.5, 'expected_average' : 5.25, 'stddev' : 2.5, 'samples' : [], 'format' : 'go'},
          'biking' : {'expected_max' : 17.0, 'expected_average' : 9.25, 'stddev' : 16.0, 'samples' : [], 'format' : 'bo'}}
 
@@ -85,11 +85,11 @@ for index, (activity, values) in enumerate(stats.items()):
 
 n = len(y)
 
-# SVM regularization parameter : For the purpose of this assignment, we will 
-# just set it to 1.0; in real applications, you should choose the C that 
-# gives the best performance metrics on a validation dataset, a separate 
+# SVM regularization parameter : For the purpose of this assignment, we will
+# just set it to 1.0; in real applications, you should choose the C that
+# gives the best performance metrics on a validation dataset, a separate
 # dataset in addition to training/test. You don't need to do this.
-C = 1.0  
+C = 1.0
 
 clf = svm.SVC(kernel = 'linear', C=C )
 
@@ -107,10 +107,10 @@ for i, (train_indexes, test_indexes) in enumerate(cv):
 
     # show the comparison between the predicted and ground-truth labels
     conf = confusion_matrix(y_test, y_pred, labels=[0,1,2])
-    
+
     print("Fold {} : The confusion matrix is :".format(i))
     print conf
-    
+
     # TODO: Compute the accuracy, precision and recall from the confusion matrix
     accuracy_scores = accuracy_score(y_test, y_pred) + accuracy_scores
     precision_scores = precision_score(y_test, y_pred, average='macro') + precision_scores

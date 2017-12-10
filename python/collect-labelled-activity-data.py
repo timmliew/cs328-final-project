@@ -6,20 +6,15 @@ Assignment A0 : Data Collection
 
 @author: cs390mb
 
-This Python script receives incoming unlabelled accelerometer data through
-the server and uses your trained classifier to predict its class label.
-The label is then sent back to the Android application via the server.
+This Python script receives incoming labelled accelerometer data through
+the server and saves it in .csv format to disk.
 
 """
 
 import socket
 import sys
 import json
-import threading
 import numpy as np
-import pickle
-from features import extract_features # make sure features.py is in the same directory
-from util import reorient, reset_vars
 
 # TODO: Replace the string with your user ID
 user_id = "102017"
@@ -34,52 +29,6 @@ count = 0
 '''
 send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 send_socket.connect(("none.cs.umass.edu", 9999))
-
-# Load the classifier:
-
-with open('classifier.pickle', 'rb') as f:
-    classifier = pickle.load(f)
-
-if classifier == None:
-    print("Classifier is null; make sure you have trained it!")
-    sys.exit()
-
-def onActivityDetected(activity):
-    """
-    Notifies the client of the current activity
-    """
-    send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'ACTIVITY_DETECTED', 'data': {'expectedactivity' : expectedactivity, 'actualactivity': actualactivity}}) + "\n")
-
-def predict(window):
-    """
-    Given a window of accelerometer data, predict the activity label.
-    Then use the onActivityDetected(activity) function to notify the
-    Android must use the same feature extraction that you used to
-    train the model.
-    """
-
-    print("Buffer filled. Run your classifier.")
-
-    # TODO: Predict class label
-
-
-    x = extract_features(window)
-    activity = classifier.predict([x])
-    if int(activity[0]) == 0:
-        print "Walking"
-        onActivityDetected("Walking")
-    elif int(activity[0]) == 1:
-        print "Sitting"
-        onActivityDetected("Sitting")
-    elif int(activity[0]) == 2:
-        print "Jumping"
-        onActivityDetected("Jumping")
-    elif int(activity[0]) == 3:
-        print "Ascending Stairs"
-        onActivityDetected("Ascending Stairs")
-    return
-
-
 
 #################   Server Connection Code  ####################
 
@@ -144,11 +93,7 @@ try:
 
     previous_json = ''
 
-    sensor_data = []
-    window_size = 25 # ~1 sec assuming 25 Hz sampling rate
-    step_size = 25 # no overlap
-    index = 0 # to keep track of how many samples we have buffered so far
-    reset_vars() # resets orientation variables
+    labelled_data = []
 
     while True:
         try:
@@ -163,27 +108,32 @@ try:
                     continue
                 previous_json = '' # reset if all were successful
                 sensor_type = data['sensor_type']
-                if (sensor_type == u"SENSOR_ACCEL"):
-                    t=data['data']['t']
-                    x=data['data']['x']
-                    y=data['data']['y']
-                    z=data['data']['z']
+                if (sensor_type == u"SENSOR_ACCEL" and 'label' in data):
 
-                    sensor_data.append(reorient(x,y,z))
-                    index+=1
-                    # make sure we have exactly window_size data points :
-                    while len(sensor_data) > window_size:
-                        sensor_data.pop(0)
+                    t = data['data']['t']
+                    x = data['data']['x']
+                    y = data['data']['y']
+                    z = data['data']['z']
+                    label = data['label']
+                    labelled_data.append([t, x, y, z, label])
 
-                    if (index >= step_size and len(sensor_data) == window_size):
-                        t = threading.Thread(target=predict, args=(np.asarray(sensor_data[:]),))
-                        t.start()
-                        index = 0
+                    print("Received Accelerometer data with label " + str(label))
+                elif (sensor_type ==u"SENSOR_GYRO" and 'label' in data):
+
+                    t = data['data']['t']
+                    x = data['data']['x']
+                    y = data['data']['y']
+                    z = data['data']['z']
+                    label = data['label']
+                    labelled_data.append([t, x, y, z, label])
+
+                    print("Received Gyroscope data with label " + str(label))
 
             sys.stdout.flush()
         except KeyboardInterrupt:
             # occurs when the user presses Ctrl-C
             print("User Interrupt. Quitting...")
+            raise KeyboardInterrupt
             break
         except Exception as e:
             # ignore exceptions, such as parsing the json
@@ -194,7 +144,10 @@ try:
             pass
 except KeyboardInterrupt:
     # occurs when the user presses Ctrl-C
-    print("User Interrupt. Qutting...")
+    print("User Interrupt. Saving labelled data...")
+    labelled_data = np.asarray(labelled_data)
+    f = open("my-activity-data.csv",'ab')
+    np.savetxt(f, labelled_data, delimiter=",")
 finally:
     print >>sys.stderr, 'closing socket for receiving data'
     receive_socket.shutdown(socket.SHUT_RDWR)

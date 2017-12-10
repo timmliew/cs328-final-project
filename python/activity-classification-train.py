@@ -49,7 +49,7 @@ from sklearn.metrics import recall_score
 
 print("Loading data...")
 sys.stdout.flush()
-data_file = os.path.join('data', 'activity-data.csv')
+data_file = 'final-data-accel.csv'
 data = np.genfromtxt(data_file, delimiter=',')
 print("Loaded {} raw labelled activity data samples.".format(len(data)))
 sys.stdout.flush()
@@ -94,7 +94,7 @@ feature_names = [
      "stddev mag", "min mag", "max mag",
      "fftx", "ffty", "fftz",
      "entropy"]
-class_names = ["Walking", "Sitting", "Jumping", "Ascending Stairs"]
+class_names = ["Attention", "Horns Up", "Trail Arms"]
 
 print("Extracting features and labels for window size {} and step size {}...".format(window_size, step_size))
 sys.stdout.flush()

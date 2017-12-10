@@ -91,6 +91,9 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     /** Displays the accelerometer x, y and z-readings. **/
     public static TextView txtGyroscopeReading;
 
+    public static TextView expectedLabel;
+    public static TextView actualLabel;
+
     /** Displays the step count computed by the built-in Android step detector. **/
     private TextView txtAndroidStepCount;
 
@@ -168,6 +171,9 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         //obtain a reference to the accelerometer reading text field
         txtAccelerometerReading = (TextView) view.findViewById(R.id.txtAccelerometerReading);
         txtGyroscopeReading = (TextView) view.findViewById(R.id.txtGyroscopeReading);
+        expectedLabel = (TextView) view.findViewById(R.id.expectedPosition);
+        actualLabel = (TextView) view.findViewById(R.id.actualPosition);
+
 
         switchAccelerometer = (Switch) view.findViewById(R.id.switchAccelerometer);
         switchAccelerometer.setChecked(mServiceManager.isServiceRunning(AccelerometerService.class));

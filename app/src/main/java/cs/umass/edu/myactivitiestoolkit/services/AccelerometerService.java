@@ -108,6 +108,8 @@ public class AccelerometerService extends SensorService implements SensorEventLi
                     JSONObject data = json.getJSONObject("data");
                     expectedactivity = data.getString("expectedactivity");
                     actualactivity = data.getString("actualactivity");
+                    ExerciseFragment.expectedLabel.setText(expectedactivity);
+                    ExerciseFragment.actualLabel.setText(actualactivity);
                     // Get instance of Vibrator from current Context
                     if(!expectedactivity.equals(actualactivity)){
                         // Vibrate for 400 milliseconds
