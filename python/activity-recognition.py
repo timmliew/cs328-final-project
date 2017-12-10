@@ -21,6 +21,7 @@ import pickle
 from features import extract_features # make sure features.py is in the same directory
 from util import reorient, reset_vars
 import time
+import matplotlib.pyplot as plt
 
 # TODO: Replace the string with your user ID
 user_id = "102017"
@@ -97,7 +98,10 @@ def predict(window, runreview):
         actualpos = "TrailArms"
 
     # append here actual verus expected
-    runreview.append({"time": curtime, "actpos": actualpos, "exppos": exppos})
+    runreview["actual"]["x"].append(curtime)
+    runreview["actual"]["y"].append(actualpos)
+    runreview["expected"]["x"].append(curtime)
+    runreview["expected"]["y"].append(exppos)
     return
 
 #################   Server Connection Code  ####################
@@ -181,7 +185,7 @@ try:
     # end the exercise
     ENDTIME = MOVETOTRAILARMS + 5
 
-    runreview = []
+    runreview = {"actual": {"x":[], "y":[]}, "expected": {"x":[], "y":[]}}
 
     while (time.time() < ENDTIME):
         try:
@@ -228,11 +232,13 @@ try:
 
     # use runreview down here to generate plot
 
-
-
-
-
-
+    plt.figure()
+    plt.plot(runreview["actual"]["x"], runreview["actual"]["y"], label="Actual")
+    plt.plot(runreview["expected"]["x"], runreview["expected"]["y"], label="Expected")
+    plt.title("Review of Run")
+    plt.xlabel("Time")
+    plt.ylabel("Position")
+    plt.show()
 
 except KeyboardInterrupt:
     # occurs when the user presses Ctrl-C
