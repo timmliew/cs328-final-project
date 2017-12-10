@@ -49,7 +49,7 @@ from sklearn.metrics import recall_score
 
 print("Loading data...")
 sys.stdout.flush()
-data_file = 'final-data.csv'
+data_file = 'final-data-accel.csv'
 data = np.genfromtxt(data_file, delimiter=',')
 print("Loaded {} raw labelled activity data samples.".format(len(data)))
 sys.stdout.flush()

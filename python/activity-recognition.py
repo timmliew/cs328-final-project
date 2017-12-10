@@ -47,14 +47,14 @@ if classifier == None:
 
 
 def expectedposition(curtime):
-    timediff = curtime - STARTTIME
+    timediff = curtime
     if timediff < MOVETOHORNSUP:
         return "Attention"
-    elif timediff < movetoattention:
+    elif timediff < MOVETOATTENTION:
         return "Horns Up"
     elif timediff < MOVETOTRAILARMS:
         return "Attention"
-    elif timediff < MOVETOATTENTION:
+    elif timediff < ENDTIME:
         return "Trail Arms"
     else:
         return "none"
@@ -67,7 +67,7 @@ def onActivityDetected(activity):
     ## use this to send buzz or sound that the person is in the wrong position
     send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'ACTIVITY_DETECTED', 'data': {'activity' : activity}}) + "\n")
 
-def predict(window):
+def predict(window, runreview):
     """
     Given a window of accelerometer data, predict the activity label.
     Then use the onActivityDetected(activity) function to notify the
@@ -88,16 +88,18 @@ def predict(window):
         onActivityDetected("Attention")
         actualpos = "Attention"
     elif int(activity[0]) == 1:
-        print "Horns Up"
-        onActivityDetected("Horns Up")
-        actualpos = "Horns Up"
+        print "HornsUp"
+        onActivityDetected("HornsUp")
+        actualpos = "HornsUp"
     elif int(activity[0]) == 2:
-        print "Trail Arms"
-        onActivityDetected("Trail Arms")
+        print "TrailArms"
+        onActivityDetected("TrailArms")
         actualpos = "TrailArms"
 
     # append here actual verus expected
-    runreview.append({"time": curtime, "actpos": actualpos, "exppos": expectedposition(curtime)})
+    exppos = expectedposition(curtime)
+    print actualpos, exppos
+    runreview.append({"time": curtime, "actpos": actualpos, "exppos": exppos})
     return
 
 
@@ -166,8 +168,8 @@ try:
     previous_json = ''
 
     sensor_data = []
-    window_size = 25 # ~1 sec assuming 25 Hz sampling rate
-    step_size = 25 # no overlap
+    window_size = 10 # ~1 sec assuming 25 Hz sampling rate
+    step_size = 10 # no overlap
     index = 0 # to keep track of how many samples we have buffered so far
     reset_vars() # resets orientation variables
 
