@@ -180,7 +180,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
                 }
             }
         });
-        switchGyro= (Switch) view.findViewById(R.id.switchGyro);
+        switchGyro = (Switch) view.findViewById(R.id.switchGyro);
         switchGyro.setChecked(mServiceManager.isServiceRunning(GyroService.class));
         switchGyro.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

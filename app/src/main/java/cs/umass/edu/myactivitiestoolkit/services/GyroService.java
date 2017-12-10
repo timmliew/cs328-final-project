@@ -31,10 +31,6 @@ public class GyroService  extends SensorService implements SensorEventListener {
 
     private Sensor mGyroscopeSensor;
 
-    public GyroService() {
-        onCreate();
-    }
-
     public void onCreate(Bundle savedInstanceState)
     {
         //get a hook to the sensor service

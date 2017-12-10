@@ -59,12 +59,12 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
     @Override
     protected void onServiceStarted() {
-//        registerSensors();
+        registerSensors();
     }
 
     @Override
     protected void onServiceStopped() {
-//        unregisterSensors();
+        unregisterSensors();
 
 
     }
@@ -127,10 +127,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         if (mAccelerometerSensor == null)
             mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        if (mGyroscopeSensor == null)
-            mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-        mSensorManager.unregisterListener(this, mGyroscopeSensor);
+        mSensorManager.unregisterListener(this, mAccelerometerSensor);
     }
 
     @Override
