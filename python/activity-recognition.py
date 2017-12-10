@@ -52,11 +52,11 @@ def expectedposition(curtime):
     if timediff < MOVETOHORNSUP:
         return "Attention"
     elif timediff < MOVETOATTENTION:
-        return "Horns Up"
+        return "HornsUp"
     elif timediff < MOVETOTRAILARMS:
         return "Attention"
     elif timediff < ENDTIME:
-        return "Trail Arms"
+        return "TrailArms"
     else:
         return "none"
 
@@ -98,9 +98,9 @@ def predict(window, runreview):
         actualpos = "TrailArms"
 
     # append here actual verus expected
-    runreview["actual"]["x"].append(curtime)
+    runreview["actual"]["x"].append(curtime-STARTTIME)
     runreview["actual"]["y"].append(actualpos)
-    runreview["expected"]["x"].append(curtime)
+    runreview["expected"]["x"].append(curtime-STARTTIME)
     runreview["expected"]["y"].append(exppos)
     return
 
@@ -238,6 +238,7 @@ try:
     plt.title("Review of Run")
     plt.xlabel("Time")
     plt.ylabel("Position")
+    plt.legend()
     plt.show()
 
 except KeyboardInterrupt:
