@@ -59,13 +59,13 @@ def expectedposition(curtime):
     else:
         return "none"
 
-def onActivityDetected(activity):
+def onActivityDetected(actualactivity, expectedactivity):
     """
     Notifies the client of the current activity
     """
 
     ## use this to send buzz or sound that the person is in the wrong position
-    send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'ACTIVITY_DETECTED', 'data': {'activity' : activity}}) + "\n")
+    send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'ACTIVITY_DETECTED', 'data': {'expectedactivity' : expectedactivity, 'actualactivity': actualactivity}}) + "\n")
 
 def predict(window, runreview):
     """
@@ -79,30 +79,26 @@ def predict(window, runreview):
 
     curtime = time.time()
 
-
     x = extract_features(window)
     activity = classifier.predict([x])
     actualpos = ''
+    exppos = expectedposition(curtime)
     if int(activity[0]) == 0:
         print "Attention"
-        onActivityDetected("Attention")
+        onActivityDetected("Attention", exppos)
         actualpos = "Attention"
     elif int(activity[0]) == 1:
         print "HornsUp"
-        onActivityDetected("HornsUp")
+        onActivityDetected("HornsUp", exppos)
         actualpos = "HornsUp"
     elif int(activity[0]) == 2:
         print "TrailArms"
-        onActivityDetected("TrailArms")
+        onActivityDetected("TrailArms", exppos)
         actualpos = "TrailArms"
 
     # append here actual verus expected
-    exppos = expectedposition(curtime)
-    print actualpos, exppos
     runreview.append({"time": curtime, "actpos": actualpos, "exppos": exppos})
     return
-
-
 
 #################   Server Connection Code  ####################
 
@@ -230,7 +226,7 @@ try:
                 print(e)
             pass
 
-    # use runreview down here to generate plot and send it back to phone
+    # use runreview down here to generate plot
 
 
 
