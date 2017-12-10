@@ -22,14 +22,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-//import com.androidplot.util.PixelUtils;
-//import com.androidplot.xy.BoundaryMode;
-//import com.androidplot.xy.LineAndPointFormatter;
-//import com.androidplot.xy.SimpleXYSeries;
-//import com.androidplot.xy.StepMode;
-//import com.androidplot.xy.XYGraphWidget;
-//import com.androidplot.xy.XYPlot;
-
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
@@ -152,6 +144,8 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     /** Reference to the service manager which communicates to the {@link AccelerometerService}. **/
     private ServiceManager mServiceManager;
 
+    Spinner spinner;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,6 +157,13 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_exercise, container, false);
+
+        //labels spinner
+        spinner = (Spinner)view.findViewById(R.id.spinner_activity);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.labels_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
         //obtain a reference to the accelerometer reading text field
         txtAccelerometerReading = (TextView) view.findViewById(R.id.txtAccelerometerReading);
@@ -176,6 +177,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
                 if (enabled){
                     mServiceManager.startSensorService(AccelerometerService.class);
                 } else {
+                    Log.d(TAG, "found spinner");
                     mServiceManager.stopSensorService(AccelerometerService.class);
                 }
             }
@@ -188,6 +190,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
                 if (enabled){
                     mServiceManager.startSensorService(GyroService.class);
                 } else {
+                    Log.d(TAG, "found spinner");
                     mServiceManager.stopSensorService(GyroService.class);
                 }
             }

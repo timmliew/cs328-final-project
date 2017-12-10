@@ -108,4 +108,12 @@
         android:orientation="horizontal">
     </LinearLayout>
 
+    <Spinner
+        android:id="@+id/spinner_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layoutGyroscope"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="49dp" />
+
 </RelativeLayout>

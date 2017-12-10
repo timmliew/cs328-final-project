@@ -60,6 +60,20 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     @Override
     protected void onServiceStarted() {
         registerSensors();
+
+        Log.i(TAG, "registered spinner listener");
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("LABEL")) {
+                    label = intent.getStringExtra("LABEL");
+                }
+            }
+        };
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(receiver, new IntentFilter("LABEL"));
     }
 
     @Override
