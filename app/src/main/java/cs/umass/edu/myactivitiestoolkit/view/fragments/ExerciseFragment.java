@@ -164,6 +164,7 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
                 R.array.labels_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
         //obtain a reference to the accelerometer reading text field
         txtAccelerometerReading = (TextView) view.findViewById(R.id.txtAccelerometerReading);
@@ -241,21 +242,21 @@ public class ExerciseFragment extends Fragment implements AdapterView.OnItemSele
         // parent.getItemAtPosition(pos)
 
 //        label = parent.getItemAtPosition(pos).toString();
-//        Log.i(TAG, "got label " + parent.getItemAtPosition(pos));
+        Log.i(TAG, "got label " + parent.getItemAtPosition(pos));
 
 
 
-//        Intent labelIntent = new Intent("LABEL");
+        Intent labelIntent = new Intent("LABEL");
 
 
-//        if (pos >= 0) {
-//            labelIntent.putExtra("LABEL", parent.getItemAtPosition(pos).toString());
-//        } else {
-//            labelIntent.putExtra("LABEL", "-1");
-//        }
-//
-//        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
-//        localBroadcastManager.sendBroadcast(labelIntent);
+        if (pos >= 0) {
+            labelIntent.putExtra("LABEL", parent.getItemAtPosition(pos).toString());
+        } else {
+            labelIntent.putExtra("LABEL", "-1");
+        }
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        localBroadcastManager.sendBroadcast(labelIntent);
 
     }
 

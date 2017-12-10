@@ -1,10 +1,15 @@
 package cs.umass.edu.myactivitiestoolkit.services;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Spinner;
 
@@ -47,12 +52,29 @@ public class GyroService  extends SensorService implements SensorEventListener {
 
     @Override
     protected void onServiceStarted() {
+
         registerSensors();
+        Log.i(TAG, "registered spinner listener");
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("LABEL")) {
+                    label = intent.getStringExtra("LABEL");
+                }
+            }
+        };
+
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(receiver, new IntentFilter("LABEL"));
     }
 
     @Override
     protected void onServiceStopped() {
+
         unregisterSensors();
+        broadcastMessage(Constants.MESSAGE.ACCELEROMETER_SERVICE_STOPPED);
+
     }
 
     @Override
@@ -147,6 +169,23 @@ public class GyroService  extends SensorService implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.i(TAG, "Accuracy changed: " + accuracy);
+    }
+
+    public void broadcastAccelerometerReading(final long timestamp, final float[] accelerometerReadings) {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.KEY.TIMESTAMP, timestamp);
+        intent.putExtra(Constants.KEY.ACCELEROMETER_DATA, accelerometerReadings);
+        intent.setAction(Constants.ACTION.BROADCAST_ACCELEROMETER_DATA);
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.sendBroadcast(intent);
+    }
+
+    public void broadcastActivity(String activity) {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.KEY.ACTIVITY, activity);
+        intent.setAction(Constants.ACTION.BROADCAST_ACTIVITY);
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.sendBroadcast(intent);
     }
 
 }

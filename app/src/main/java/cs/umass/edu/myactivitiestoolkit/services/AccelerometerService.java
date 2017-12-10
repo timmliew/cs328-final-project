@@ -77,6 +77,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     @Override
     protected void onServiceStopped() {
         unregisterSensors();
+        broadcastMessage(Constants.MESSAGE.ACCELEROMETER_SERVICE_STOPPED);
 
 
     }
@@ -120,9 +121,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-//        mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-//        mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         //TODO : (Assignment 0) Register the accelerometer sensor from the sensor manager.
     }
@@ -182,6 +180,23 @@ public class AccelerometerService extends SensorService implements SensorEventLi
         @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.i(TAG, "Accuracy changed: " + accuracy);
+    }
+
+    public void broadcastAccelerometerReading(final long timestamp, final float[] accelerometerReadings) {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.KEY.TIMESTAMP, timestamp);
+        intent.putExtra(Constants.KEY.ACCELEROMETER_DATA, accelerometerReadings);
+        intent.setAction(Constants.ACTION.BROADCAST_ACCELEROMETER_DATA);
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.sendBroadcast(intent);
+    }
+
+    public void broadcastActivity(String activity) {
+        Intent intent = new Intent();
+        intent.putExtra(Constants.KEY.ACTIVITY, activity);
+        intent.setAction(Constants.ACTION.BROADCAST_ACTIVITY);
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.sendBroadcast(intent);
     }
 
 }
