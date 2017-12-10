@@ -81,7 +81,7 @@
         android:layout_above="@+id/layoutGyroscope"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="33dp"
+        android:layout_marginBottom="40dp"
         android:gravity="center"
         android:checked="true"
         android:textSize="24sp"
@@ -95,7 +95,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/layoutAccelerometer"
-        android:layout_marginTop="98dp"
+        android:layout_marginTop="140dp"
         android:gravity="center"
         android:text="X: -- Y: -- Z: --"
         android:textSize="20sp" />

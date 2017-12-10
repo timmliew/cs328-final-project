@@ -35,7 +35,6 @@ import cs.umass.edu.myactivitiestoolkit.constants.Constants;
 import cs.umass.edu.myactivitiestoolkit.services.AccelerometerService;
 import cs.umass.edu.myactivitiestoolkit.services.GyroService;
 import cs.umass.edu.myactivitiestoolkit.services.ServiceManager;
-import cs.umass.edu.myactivitiestoolkit.services.msband.BandService;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 

@@ -139,7 +139,7 @@ public class GyroService  extends SensorService implements SensorEventListener {
 
     @Override
     protected String getNotificationContentText() {
-        return getString(R.string.activity_service_notification);
+        return getString(R.string.gyro_activity_service_notification);
     }
 
     @Override
@@ -150,6 +150,10 @@ public class GyroService  extends SensorService implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
+        {
+            return;
+        }
         if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             ExerciseFragment.txtGyroscopeReading.setText(" X: " + Float.toString(event.values[0])
                     + " Y: " + Float.toString(event.values[1]) + " Z: " + Float.toString(event.values[2]));

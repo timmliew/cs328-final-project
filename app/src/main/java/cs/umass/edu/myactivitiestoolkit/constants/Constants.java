@@ -121,5 +121,6 @@ public class Constants {
         String ACTIVITY_DETECTED = "ACTIVITY_DETECTED";
         String SPEAKER_DETECTED = "SPEAKER_DETECTED";
         String CLUSTER = "CLUSTER";
+        String ACCELEROMETER = "ACCELEROMETER";
     }
 }

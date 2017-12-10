@@ -16,6 +16,7 @@ import android.view.View;
 import android.os.Bundle;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.os.Vibrator;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,13 +99,21 @@ public class AccelerometerService extends SensorService implements SensorEventLi
                 }
             }
         });
-        mClient.registerMessageReceiver(new MessageReceiver(Constants.MHLClientFilter.ACTIVITY_DETECTED) {
+        mClient.registerMessageReceiver(new MessageReceiver(Constants.MHLClientFilter.ACCELEROMETER) {
             @Override
             protected void onMessageReceived(JSONObject json) {
-                String activity;
+                String expectedactivity, actualactivity;
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 try {
                     JSONObject data = json.getJSONObject("data");
-                    activity = data.getString("activity");
+                    expectedactivity = data.getString("expectedactivity");
+                    actualactivity = data.getString("actualactivity");
+                    // Get instance of Vibrator from current Context
+                    if(!expectedactivity.equals(actualactivity)){
+                        // Vibrate for 400 milliseconds
+                        v.vibrate(400);
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -147,7 +156,7 @@ public class AccelerometerService extends SensorService implements SensorEventLi
 
     @Override
     protected String getNotificationContentText() {
-        return getString(R.string.activity_service_notification);
+        return getString(R.string.accel_activity_service_notification);
     }
 
     @Override
@@ -159,9 +168,14 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     @Override
     public void onSensorChanged(SensorEvent event) {
 
+        if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
+        {
+            return;
+        }
+
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            ExerciseFragment.txtAccelerometerReading.setText(" X: " + event.values[0]
-                    + " Y: " + event.values[1] + " Z: " + event.values[2]);
+            ExerciseFragment.txtAccelerometerReading.setText(" X: " + Float.toString(event.values[0])
+                    + " Y: " + Float.toString(event.values[1]) + " Z: " + Float.toString(event.values[2]));
 
             // convert the timestamp to milliseconds (note this is not in Unix time)
             long timestamp_in_milliseconds = (long) ((double) event.timestamp / Constants.TIMESTAMPS.NANOSECONDS_PER_MILLISECOND);

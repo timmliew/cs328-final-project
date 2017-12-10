@@ -9,6 +9,7 @@
 <resources>
     <string name="location_service_notification">Collecting Location Data</string>
     <string name="audio_service_notification">Collecting Microphone Data</string>
-    <string name="activity_service_notification">Collecting Accelerometer Data</string>
+    <string name="accel_activity_service_notification">Collecting Accelerometer Data</string>
+    <string name="gyro_activity_service_notification">Collecting Gyroscope Data</string>
     <string name="ppg_service_notification">Collecting PPG Data</string>
 </resources>
