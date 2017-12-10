@@ -20,6 +20,7 @@ import numpy as np
 import pickle
 from features import extract_features # make sure features.py is in the same directory
 from util import reorient, reset_vars
+import time
 
 # TODO: Replace the string with your user ID
 user_id = "102017"
@@ -44,10 +45,26 @@ if classifier == None:
     print("Classifier is null; make sure you have trained it!")
     sys.exit()
 
+
+def expectedposition(curtime):
+    timediff = curtime - STARTTIME
+    if timediff < MOVETOHORNSUP:
+        return "Attention"
+    elif timediff < movetoattention:
+        return "Horns Up"
+    elif timediff < MOVETOTRAILARMS:
+        return "Attention"
+    elif timediff < MOVETOATTENTION:
+        return "Trail Arms"
+    else:
+        return "none"
+
 def onActivityDetected(activity):
     """
     Notifies the client of the current activity
     """
+
+    ## use this to send buzz or sound that the person is in the wrong position
     send_socket.send(json.dumps({'user_id' : user_id, 'sensor_type' : 'SENSOR_SERVER_MESSAGE', 'message' : 'ACTIVITY_DETECTED', 'data': {'activity' : activity}}) + "\n")
 
 def predict(window):
@@ -60,23 +77,27 @@ def predict(window):
 
     print("Buffer filled. Run your classifier.")
 
-    # TODO: Predict class label
+    curtime = time.time()
 
 
     x = extract_features(window)
     activity = classifier.predict([x])
+    actualpos = ''
     if int(activity[0]) == 0:
-        print "Walking"
-        onActivityDetected("Walking")
+        print "Attention"
+        onActivityDetected("Attention")
+        actualpos = "Attention"
     elif int(activity[0]) == 1:
-        print "Sitting"
-        onActivityDetected("Sitting")
+        print "Horns Up"
+        onActivityDetected("Horns Up")
+        actualpos = "Horns Up"
     elif int(activity[0]) == 2:
-        print "Jumping"
-        onActivityDetected("Jumping")
-    elif int(activity[0]) == 3:
-        print "Ascending Stairs"
-        onActivityDetected("Ascending Stairs")
+        print "Trail Arms"
+        onActivityDetected("Trail Arms")
+        actualpos = "TrailArms"
+
+    # append here actual verus expected
+    runreview.append({"time": curtime, "actpos": actualpos, "exppos": expectedposition(curtime)})
     return
 
 
@@ -150,7 +171,21 @@ try:
     index = 0 # to keep track of how many samples we have buffered so far
     reset_vars() # resets orientation variables
 
-    while True:
+    # set up timer to see what the activity should be vs what it is
+    #start tracking motions
+    STARTTIME = time.time()
+    # starts in attention position for 5 seconds, keep clicks going
+    MOVETOHORNSUP = STARTTIME + 5
+    # from horns up position move back to attention for 5 seconds, keep clicks going
+    MOVETOATTENTION = MOVETOHORNSUP + 5
+    # from attention position move to trail arms for 5 seconds, keep clicks going
+    MOVETOTRAILARMS = MOVETOATTENTION + 5
+    # end the exercise
+    ENDTIME = MOVETOTRAILARMS + 5
+
+    runreview = []
+
+    while (time.time() < ENDTIME):
         try:
             message = receive_socket.recv(1024).strip()
             json_strings = message.split("\n")
@@ -176,7 +211,7 @@ try:
                         sensor_data.pop(0)
 
                     if (index >= step_size and len(sensor_data) == window_size):
-                        t = threading.Thread(target=predict, args=(np.asarray(sensor_data[:]),))
+                        t = threading.Thread(target=predict, args=(np.asarray(sensor_data[:]),runreview,))
                         t.start()
                         index = 0
 
@@ -192,6 +227,15 @@ try:
             if (e.message != "timed out"):  # ignore timeout exceptions completely
                 print(e)
             pass
+
+    # use runreview down here to generate plot and send it back to phone
+
+
+
+
+
+
+
 except KeyboardInterrupt:
     # occurs when the user presses Ctrl-C
     print("User Interrupt. Qutting...")
