@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Spinner;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +31,12 @@ public class GyroService  extends SensorService implements SensorEventListener {
 
 
     private Sensor mGyroscopeSensor;
+
+    /** The spinner containing the activity label. */
+    Spinner spinner;
+
+    /** The activity label for data collection. */
+    String label = "";
 
     public void onCreate(Bundle savedInstanceState)
     {
@@ -128,7 +135,12 @@ public class GyroService  extends SensorService implements SensorEventListener {
             // convert the timestamp to milliseconds (note this is not in Unix time)
             long timestamp_in_milliseconds = (long) ((double) event.timestamp / Constants.TIMESTAMPS.NANOSECONDS_PER_MILLISECOND);
 
-            mClient.sendSensorReading(new GyroscopeReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, 02, event.values));
+            int labelInt = -1;
+            if (!(label.equals("") || label.equals("Label"))) {
+                labelInt = Integer.parseInt("" + label.charAt(0));
+            }
+
+            mClient.sendSensorReading(new GyroscopeReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, labelInt, event.values));
         }
     }
 

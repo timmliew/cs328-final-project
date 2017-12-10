@@ -41,8 +41,6 @@ public class AccelerometerService extends SensorService implements SensorEventLi
     /** Manages the physical accelerometer sensor on the phone. */
     private Sensor mAccelerometerSensor;
 
-    private Sensor mGyroscopeSensor;
-
     /** The spinner containing the activity label. */
     Spinner spinner;
 
@@ -170,7 +168,12 @@ public class AccelerometerService extends SensorService implements SensorEventLi
             // convert the timestamp to milliseconds (note this is not in Unix time)
             long timestamp_in_milliseconds = (long) ((double) event.timestamp / Constants.TIMESTAMPS.NANOSECONDS_PER_MILLISECOND);
 
-            mClient.sendSensorReading(new AccelerometerReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds, 01, event.values));
+            int labelInt = -1;
+            if (!(label.equals("") || label.equals("Label"))) {
+                labelInt = Integer.parseInt("" + label.charAt(0));
+            }
+
+            mClient.sendSensorReading(new AccelerometerReading(getString(R.string.mobile_health_client_user_id), "MOBILE", "", timestamp_in_milliseconds,labelInt, event.values));
 
         }
 
