@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg')
+
 # -*- coding: utf-8 -*-
 """
 Created on Wed Sep  7 15:34:11 2016
@@ -50,13 +53,13 @@ if classifier == None:
 def expectedposition(curtime):
     timediff = curtime
     if timediff < MOVETOHORNSUP:
-        return "Attention"
+        return "Attention", 0
     elif timediff < MOVETOATTENTION:
-        return "HornsUp"
+        return "HornsUp", 1
     elif timediff < MOVETOTRAILARMS:
-        return "Attention"
+        return "Attention", 0
     elif timediff < ENDTIME:
-        return "TrailArms"
+        return "TrailArms", 2
     else:
         return "none"
 
@@ -85,23 +88,23 @@ def predict(window, runreview):
     actualpos = ''
     exppos = expectedposition(curtime)
     if int(activity[0]) == 0:
-        print "Expected: %s, Actual: Attention" % exppos
-        onActivityDetected("Attention", exppos)
+        print "Expected: %s, Actual: Attention" % exppos[0]
+        onActivityDetected("Attention", exppos[0])
         actualpos = "Attention"
     elif int(activity[0]) == 1:
-        print "Expected: %s, Actual: HornsUp" % exppos
-        onActivityDetected("HornsUp", exppos)
+        print "Expected: %s, Actual: HornsUp" % exppos[0]
+        onActivityDetected("HornsUp", exppos[0])
         actualpos = "HornsUp"
     elif int(activity[0]) == 2:
-        print "Expected: %s, Actual: TrailArms" % exppos
-        onActivityDetected("TrailArms", exppos)
+        print "Expected: %s, Actual: TrailArms" % exppos[0]
+        onActivityDetected("TrailArms", exppos[0])
         actualpos = "TrailArms"
 
     # append here actual verus expected
     runreview["actual"]["x"].append(curtime-STARTTIME)
-    runreview["actual"]["y"].append(actualpos)
+    runreview["actual"]["y"].append(activity[0])
     runreview["expected"]["x"].append(curtime-STARTTIME)
-    runreview["expected"]["y"].append(exppos)
+    runreview["expected"]["y"].append(exppos[1])
     return
 
 #################   Server Connection Code  ####################
@@ -233,13 +236,15 @@ try:
     # use runreview down here to generate plot
 
     plt.figure()
-    plt.plot(runreview["actual"]["x"], runreview["actual"]["y"], label="Actual")
-    plt.plot(runreview["expected"]["x"], runreview["expected"]["y"], label="Expected")
+    plt.plot(runreview["actual"]["x"], runreview["actual"]["y"], label="Actual",linewidth=10)
+    plt.plot(runreview["expected"]["x"], runreview["expected"]["y"], label="Expected",linewidth=10)
+    plt.yticks([0, 1, 2], ["Attention", "HornsUp", "TrailArms"])
+    # plt.set_yticklabels(["Attention", "HornsUp", "TrailArms"])
     plt.title("Review of Run")
     plt.xlabel("Time")
     plt.ylabel("Position")
     plt.legend()
-    plt.show()
+    plt.savefig('runreview.png')
 
 except KeyboardInterrupt:
     # occurs when the user presses Ctrl-C
