@@ -85,15 +85,15 @@ def predict(window, runreview):
     actualpos = ''
     exppos = expectedposition(curtime)
     if int(activity[0]) == 0:
-        print "Attention"
+        print "Expected: %s, Actual: Attention" % exppos
         onActivityDetected("Attention", exppos)
         actualpos = "Attention"
     elif int(activity[0]) == 1:
-        print "HornsUp"
+        print "Expected: %s, Actual: HornsUp" % exppos
         onActivityDetected("HornsUp", exppos)
         actualpos = "HornsUp"
     elif int(activity[0]) == 2:
-        print "TrailArms"
+        print "Expected: %s, Actual: TrailArms" % exppos
         onActivityDetected("TrailArms", exppos)
         actualpos = "TrailArms"
 
